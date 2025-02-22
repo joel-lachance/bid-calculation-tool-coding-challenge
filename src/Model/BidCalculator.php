@@ -5,22 +5,33 @@ namespace App\Model;
 class BidCalculator
 {
 
+    // Constants properties
     const TYPE_CAR_COMMON = 'common';
     const TYPE_CAR_LUXURY = 'luxury';
     const FIX_STORAGE_FEE = 100;
+    const BASIC_BUYERS_FEE_PERCENT = 0.1;
+    const SPECIAL_FEE_COMMON = 0.02;
+    const SPECIAL_FEE_LUXURY = 0.04;
 
+    // Privates properties
     private int $_vehicule_base_price = 0;
     private string $_car_type = '';
 
+    // Public methods
     public function __construct(float $vehicule_base_price, string $car_type)
     {
         $this->_vehicule_base_price = $vehicule_base_price;
         $this->_car_type = $car_type;
     }
 
-    public function getBasicBuyersFee()
+    /**
+     * Return the basic buyer's fee depending on the car type
+     *
+     * @return float
+     */
+    public function getBasicBuyersFee(): float
     {
-        $price = $this->_vehicule_base_price * 0.1;
+        $price = $this->_vehicule_base_price * self::BASIC_BUYERS_FEE_PERCENT;
 
         switch ($this->_car_type) {
             case self::TYPE_CAR_COMMON:
@@ -34,22 +45,32 @@ class BidCalculator
         return max($options['min'], min($options['max'], $price));
     }
 
-    public function getSpecialFee()
-    {
 
+    /**
+     * Return the special fee depending on the car type
+     *
+     * @return float
+     */
+    public function getSpecialFee(): float
+    {
         switch ($this->_car_type) {
             case self::TYPE_CAR_COMMON:
-                $percent = 0.02;
+                $percent = self::SPECIAL_FEE_COMMON;
                 break;
             case self::TYPE_CAR_LUXURY:
-                $percent = 0.04;
+                $percent = self::SPECIAL_FEE_LUXURY;
                 break;
         }
 
         return $this->_vehicule_base_price * $percent;
     }
 
-    public function getAssociationFee()
+    /**
+     * Return the association fee depending on the car price
+     *
+     * @return float
+     */
+    public function getAssociationFee(): float
     {
         $price = $this->_vehicule_base_price;
 
@@ -67,12 +88,24 @@ class BidCalculator
         }
     }
 
-    public function getFixedStorageFee()
+
+    /**
+     * Return the fixed storage fee
+     *
+     * @return float
+     */
+    public function getFixedStorageFee(): float
     {
         return self::FIX_STORAGE_FEE;
     }
 
-    public function getTotalFee()
+
+    /**
+     * Return the total fee
+     *
+     * @return float
+     */
+    public function getTotalFee(): float
     {
         $feeMethods = [
             'getBasicBuyersFee',
@@ -83,19 +116,37 @@ class BidCalculator
 
         return array_reduce($feeMethods, function ($fee, $method) {
             return $fee + $this->$method();
-        }, 0);
+        }, $this->_vehicule_base_price);
     }
 
+
+
+    /**
+     * Return the API response
+     *
+     * @return array
+     */
     public function getApiResponse()
     {
         return [
             'fees' => [
-                'basic' => $this->getBasicBuyersFee(),
-                'special' => $this->getSpecialFee(),
-                'association' => $this->getAssociationFee(),
-                'fixed' => $this->getFixedStorageFee(),
+                'basic' => $this->roundFee($this->getBasicBuyersFee()),
+                'special' => $this->roundFee($this->getSpecialFee()),
+                'association' => $this->roundFee($this->getAssociationFee()),
+                'fixed' => $this->roundFee($this->getFixedStorageFee()),
             ],
-            'total' => $this->getTotalFee()
+            'total' => $this->roundFee($this->getTotalFee())
         ];
+    }
+
+    /**
+     * Format fee to 2 decimals
+     *
+     * @param float $fee
+     * @return float
+     */
+    private function roundFee(float $fee): float
+    {
+        return round($fee, 2);
     }
 }
