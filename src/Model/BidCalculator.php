@@ -135,7 +135,9 @@ class BidCalculator
                 'association' => $this->roundFee($this->getAssociationFee()),
                 'fixed' => $this->roundFee($this->getFixedStorageFee()),
             ],
-            'total' => $this->roundFee($this->getTotalFee())
+            'total' => $this->roundFee($this->getTotalFee()),
+            'vehicule_base_price' => $this->roundFee($this->_vehicule_base_price),
+            'car_type' => $this->_car_type
         ];
     }
 
