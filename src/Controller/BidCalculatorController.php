@@ -5,6 +5,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -13,7 +14,7 @@ use App\Model\BidCalculator;
 final class BidCalculatorController extends AbstractController
 {
     #[Route('/api/bid-calculator', name: 'app_bid_calculator', methods: ['POST'])]
-    public function index(Request $request, ValidatorInterface $validator): JsonResponse
+    public function apiPost(Request $request, ValidatorInterface $validator): JsonResponse
     {
         // Get POST data from request
         $data = $request->request->all();
@@ -41,5 +42,12 @@ final class BidCalculatorController extends AbstractController
 
         // Return JSON response
         return $this->json($calculator->getApiResponse());
+    }
+
+
+    #[Route('/bid-calculator', name: 'bid_calculator_index', methods: ['GET'])]
+    public function index(): Response
+    {
+        return $this->render('bid_calculator/index.html.twig');
     }
 }
