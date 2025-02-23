@@ -20,6 +20,16 @@ class BidCalculator
     // Public methods
     public function __construct(float $vehicule_base_price, string $car_type)
     {
+
+        if ($vehicule_base_price <= 0) {
+            throw new \InvalidArgumentException("Vehicule base price must be greater than 0");
+        }
+
+        if (!in_array($car_type, [self::TYPE_CAR_COMMON, self::TYPE_CAR_LUXURY])) {
+            throw new \InvalidArgumentException("Car type is invalid");
+        }
+
+
         $this->_vehicule_base_price = $vehicule_base_price;
         $this->_car_type = $car_type;
     }
