@@ -1,47 +1,95 @@
 <template>
-    <div>
-      <form>
+    <v-app>
+        <v-container>
+            
+            <v-alert
+                text="Please enter the vehicle's base price and type to get the list of related fees."
+                title="Bid Calculation Tool"
+                type="info"
+                class="mb-4"></v-alert>
 
-        <fieldset>
-            <label for="phone">Vehicle base price:</label>
-            <input type="text" id="base_price" name="base_price" v-model="formData.base_price" required> $
-        </fieldset>
+            <v-alert v-if="error"
+                title="An error occurred"
+                type="error"
+                class="mb-4">{{ error }}</v-alert>
 
-        <fieldset>
-            <label for="phone">Vehicle type:</label>
-            <select id="type" name="type" v-model="formData.type" required>
-                <option value="car">Type of vehicule</option>
-                <option value="common">Common</option>
-                <option value="luxury">Luxury</option>
-            </select>
-        </fieldset>
+            <v-row>
 
-      </form>
+                <v-col cols="12" md="4">
+                    <v-text-field 
+                        v-model="formData.base_price" 
+                        type="number"
+                        label="Vehicule base price"
+                        append-inner-icon="mdi-currency-usd"
+                        required></v-text-field>
+                </v-col>
 
-        <div v-if="response">
-            <h3>Fees:</h3>
-            <ul>
-                <li>Basic Buyer's Fee: <span>{{ formatCurrency(response.fees.basic) }}</span></li>
-                <li>seller's special fee: <span>{{ formatCurrency(response.fees.special) }}</span></li>
-                <li>Association fee: <span>{{ formatCurrency(response.fees.association) }}</span></li>
-                <li>Storage fee: <span>{{ formatCurrency(response.fees.fixed) }}</span></li>
-                <li><strong>Total: <span>{{ formatCurrency(response.total) }}</span></strong></li>
-            </ul>
-        </div>
+                <v-col cols="12" md="4">
+                    <v-select
+                        v-model="formData.type"
+                        label="Type of vehicule"
+                        :items="[{ title: 'Common', value: 'common' }, { title: 'Luxury', value: 'luxury' }]"
+                        append-inner-icon="mdi-car-select"
+                        ></v-select>
+                </v-col>
 
-        <div v-if="error">
-            <h3 style="color: red;">Error:</h3>
-            <p>{{ error }}</p>
-        </div>
+            </v-row>
 
+            <v-list v-if="response">
+                <v-list-item-group>
+                    <!-- Basic Buyer's Fee -->
+                    <v-list-item>
+                        <v-list-item-content>
+                            <v-list-item-title>Basic Buyer's Fee:</v-list-item-title>
+                            <v-list-item-subtitle>{{ formatCurrency(response.fees.basic) }}</v-list-item-subtitle>
+                        </v-list-item-content>
+                    </v-list-item>
 
-    </div>
+                    <!-- Seller's Special Fee -->
+                    <v-list-item>
+                        <v-list-item-content>
+                            <v-list-item-title>Seller's Special Fee:</v-list-item-title>
+                            <v-list-item-subtitle>{{ formatCurrency(response.fees.special) }}</v-list-item-subtitle>
+                        </v-list-item-content>
+                    </v-list-item>
+
+                    <!-- Association Fee -->
+                    <v-list-item>
+                        <v-list-item-content>
+                            <v-list-item-title>Association Fee:</v-list-item-title>
+                            <v-list-item-subtitle>{{ formatCurrency(response.fees.association) }}</v-list-item-subtitle>
+                        </v-list-item-content>
+                    </v-list-item>
+
+                    <!-- Storage Fee -->
+                    <v-list-item>
+                        <v-list-item-content>
+                            <v-list-item-title>Storage Fee:</v-list-item-title>
+                            <v-list-item-subtitle>{{ formatCurrency(response.fees.fixed) }}</v-list-item-subtitle>
+                        </v-list-item-content>
+                    </v-list-item>
+
+                    <!-- Total -->
+                    <v-list-item>
+                        <v-list-item-content>
+                            <v-list-item-title><strong>Total:</strong></v-list-item-title>
+                            <v-list-item-subtitle><strong>{{ formatCurrency(response.total) }}</strong></v-list-item-subtitle>
+                        </v-list-item-content>
+                    </v-list-item>
+                </v-list-item-group>
+            </v-list>
+                   
+        </v-container>
+    </v-app>
   </template>
 
 <script>
 import { throttle } from "lodash";
 
 export default {
+
+
+    name: "App",
 
     data() {
         return {
@@ -74,12 +122,13 @@ export default {
         },
 
         // On form input change, validate form data is empty before calling API
+        // Reset error alert if any
         onInputChange() {
+
+            this.error = null;
+
             if (this.formData.base_price && this.formData.type) {
                 this.throttledSubmitForm();
-            } else {
-                this.response = null;
-                this.error = "Please fill in both fields.";
             }
         },
 
@@ -99,7 +148,7 @@ export default {
                 });
 
                 if (!res.ok) {
-                throw new Error("Failed to fetch data.");
+                    throw new Error("Failed to fetch data.");
                 }
 
                 this.response = await res.json();
