@@ -13,6 +13,14 @@ use App\Model\BidCalculator;
 
 final class BidCalculatorController extends AbstractController
 {
+
+    #[Route('/', name: 'bid_calculator_index', methods: ['GET'])]
+    public function index(): Response
+    {
+        return $this->render('bid_calculator/index.html.twig');
+    }
+
+
     #[Route('/api/bid-calculator', name: 'app_bid_calculator', methods: ['POST'])]
     public function apiPost(Request $request, ValidatorInterface $validator): JsonResponse
     {
@@ -36,18 +44,10 @@ final class BidCalculatorController extends AbstractController
             return $this->json(['errors' => $errors], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-
         // Create BidCalculator instance
         $calculator = new BidCalculator($data['base_price'], $data['type']);
 
         // Return JSON response
         return $this->json($calculator->getApiResponse());
-    }
-
-
-    #[Route('/bid-calculator', name: 'bid_calculator_index', methods: ['GET'])]
-    public function index(): Response
-    {
-        return $this->render('bid_calculator/index.html.twig');
     }
 }
