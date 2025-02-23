@@ -137,6 +137,10 @@ export default {
             this.response = null;
             this.error = null;
 
+            if (!this.formData.base_price || !this.formData.type) {
+                return;
+            }
+
             const formData = new FormData();
             formData.append("base_price", this.formData.base_price);
             formData.append("type", this.formData.type);
