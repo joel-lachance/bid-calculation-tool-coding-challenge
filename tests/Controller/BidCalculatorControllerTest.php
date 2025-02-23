@@ -65,9 +65,8 @@ final class BidCalculatorControllerTest extends WebTestCase
 
     ];
 
-    public function testIndex(): void
+    public function testGetTotalAndSubtotalFeesFromCollections(): void
     {
-
         foreach (self::FEES_CONFIGURATION as $config) {
             $config = (object) $config;
             $calculator = new BidCalculator($config->base_price, $config->type);
@@ -78,5 +77,129 @@ final class BidCalculatorControllerTest extends WebTestCase
             $this->assertEquals($config->storage_fee, round($calculator->getFixedStorageFee(), 2), "Fixed storage fee is incorrect !");
             $this->assertEquals($config->total_fee, round($calculator->getTotalFee(), 2), "Total fee is incorrect !");
         }
+    }
+
+    /**
+     * Constructor
+     */
+    public function testConstructorWithValidParameters(): void
+    {
+        $calculator = new BidCalculator(1000.00, BidCalculator::TYPE_CAR_COMMON);
+        $this->assertInstanceOf(BidCalculator::class, $calculator);
+    }
+
+    public function testConstructorWithInvalidVehicleBasePrice(): void
+    {
+        $this->expectException(\TypeError::class);
+        new BidCalculator('invalid_price', BidCalculator::TYPE_CAR_COMMON);
+    }
+
+    public function testConstructorWithInvalidCarType(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new BidCalculator(1000.00, 123);
+    }
+
+    /**
+     * Basic fee
+     */
+    public function testGetBasicBuyersFeeForCommonCar(): void
+    {
+        $calculator = new BidCalculator(120.00, BidCalculator::TYPE_CAR_COMMON);
+        $fee = $calculator->getBasicBuyersFee();
+
+        $this->assertEquals(12.00, $fee);
+    }
+
+    public function testGetBasicBuyersFeeMaxForCommonCar(): void
+    {
+        $calculator = new BidCalculator(10.00, BidCalculator::TYPE_CAR_COMMON);
+        $fee = $calculator->getBasicBuyersFee();
+
+        $this->assertEquals(10.00, $fee);
+    }
+
+    public function testGetBasicBuyersFeeMinForCommonCar(): void
+    {
+        $calculator = new BidCalculator(1000.00, BidCalculator::TYPE_CAR_COMMON);
+        $fee = $calculator->getBasicBuyersFee();
+
+        $this->assertEquals(50.00, $fee);
+    }
+
+    public function testGetBasicBuyersFeeForLuxuryCar(): void
+    {
+        $calculator = new BidCalculator(500.00, BidCalculator::TYPE_CAR_LUXURY);
+        $fee = $calculator->getBasicBuyersFee();
+
+        $this->assertEquals(50.00, $fee);
+    }
+
+    public function testGetBasicBuyersFeeMaxForLuxuryCar(): void
+    {
+        $calculator = new BidCalculator(9999.00, BidCalculator::TYPE_CAR_LUXURY);
+        $fee = $calculator->getBasicBuyersFee();
+
+        $this->assertEquals(200.00, $fee);
+    }
+
+    public function testGetBasicBuyersFeeMinForLuxuryCar(): void
+    {
+        $calculator = new BidCalculator(100.00, BidCalculator::TYPE_CAR_LUXURY);
+        $fee = $calculator->getBasicBuyersFee();
+
+        $this->assertEquals(25.00, $fee);
+    }
+
+    /**
+     * Special fee
+     */
+    public function testGetSpecialFeeForCommonCar(): void
+    {
+        $calculator = new BidCalculator(100.00, BidCalculator::TYPE_CAR_COMMON);
+        $fee = $calculator->getSpecialFee();
+
+        $expectedFee = 100.00 * BidCalculator::SPECIAL_FEE_COMMON;
+
+        $this->assertEquals($expectedFee, $fee);
+    }
+
+    public function testGetSpecialFeeForLuxuryCar(): void
+    {
+        $calculator = new BidCalculator(100.00, BidCalculator::TYPE_CAR_LUXURY);
+        $fee = $calculator->getSpecialFee();
+
+        $expectedFee = 100.00 * BidCalculator::SPECIAL_FEE_LUXURY;
+
+        $this->assertEquals($expectedFee, $fee);
+    }
+
+    /**
+     * Association fee
+     */
+    public function testGetAssociationFee(): void
+    {
+        $calculator = new BidCalculator(1500.00, BidCalculator::TYPE_CAR_COMMON);
+        $fee = $calculator->getAssociationFee();
+
+        $this->assertEquals(15.00, $fee);
+    }
+
+    /**
+     * Api schema
+     */
+    public function testGetApiResponse(): void
+    {
+        $calculator = new BidCalculator(1500.00, BidCalculator::TYPE_CAR_COMMON);
+        $response = $calculator->getApiResponse();
+
+        $this->assertArrayHasKey('fees', $response);
+        $this->assertArrayHasKey('total', $response);
+        $this->assertArrayHasKey('vehicule_base_price', $response);
+        $this->assertArrayHasKey('car_type', $response);
+
+        $this->assertEquals(1500.00, $response['vehicule_base_price']);
+        $this->assertEquals(BidCalculator::TYPE_CAR_COMMON, $response['car_type']);
+        $this->assertArrayHasKey('basic', $response['fees']);
     }
 }
