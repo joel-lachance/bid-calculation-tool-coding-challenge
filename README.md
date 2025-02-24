@@ -20,6 +20,8 @@ While the application is fully functional, some areas could be improved with mor
 - Implementation of a Node server for live reload of the Vue.js application.
 - The VueJS application would have benefited from being split into multiple components instead of being directly in App.vue.
 
+## 👀 Preview
+<img src="assets/docs/bid_calculation_tool_preview.png" />
 
 ---
 
