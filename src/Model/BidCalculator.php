@@ -52,6 +52,7 @@ class BidCalculator
                 break;
         }
 
+        // Return the price if between min and max, otherwise return the min or max value
         return max($options['min'], min($options['max'], $price));
     }
 
@@ -124,6 +125,7 @@ class BidCalculator
             'getFixedStorageFee'
         ];
 
+        // Sum all fees methods starting from the base price
         return array_reduce($feeMethods, function ($fee, $method) {
             return $fee + $this->$method();
         }, $this->_vehicule_base_price);
