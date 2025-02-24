@@ -1,3 +1,29 @@
+# 🧑‍💻 Coding Challenge: Aimed at Code Reviewers
+
+## 🔍 Overview
+This project allowed me to use Symfony for the very first time. It is a fullstack application designed to calculate bid-related fees based on various parameters. 
+The tool was built as part of a coding challenge and demonstrates backend logic and frontend integration.
+To stay within a reasonable scope, I aimed to limit development time to approximately 3-4 hours.
+
+## 🧠 Approach
+Given the limited time available, I focused on delivering a functional and maintainable solution while making trade-offs where necessary. Some constraints included:
+- Implementing only essential features to meet the challenge requirements.
+- Prioritizing backend calculations and basic frontend display over advanced UI/UX improvements.
+- Using straightforward validation and business logic instead of a more extensive rules engine.
+
+## ⚠️ Limitations
+While the application is fully functional, some areas could be improved with more time:
+- Better Data Validation: More robust type-checking and error handling could be implemented for user inputs.
+- Improved UI/UX: The frontend could be enhanced with additional styling and a better user experience.
+- Edge Case Handling: Some edge cases are not fully accounted for due to time constraints.
+- More Comprehensive Testing: Unit and integration tests could be expanded to cover all possible scenarios.
+- Implementation of a Node server for live reload of the Vue.js application.
+- The VueJS application would have benefited from being split into multiple components instead of being directly in App.vue.
+
+
+---
+
+
 # Project Setup & Development Guide for the Bid Calculator tool coding challenge
 
 ## Prerequisites
@@ -84,4 +110,3 @@ ddev exec ./vendor/bin/phpunit tests/Controller/BidCalculatorControllerTest.php
 - [DDEV Documentation](https://ddev.readthedocs.io/)
 - [Symfony Documentation](https://symfony.com/doc/current/index.html)
 - [PHPUnit Documentation](https://phpunit.de/documentation.html)
-
