@@ -29,6 +29,13 @@ Inside the DDEV container, install project dependencies:
 ddev exec composer install
 ```
 
+### 3. Launch the Project  
+Once everything is set up, start the project with the following command:  
+
+```bash
+ddev launch
+```
+
 ---
 
 ## 🧪 Running PHP Unit Tests
